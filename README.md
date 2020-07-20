@@ -1,4 +1,4 @@
-# LateComerApp [ucheduk.github.io/latecomerapp/](https://ucheduk.github.io/latecomerapp/)
+# LateComerApp [latecomerapp.netlify.app](https://latecomerapp.netlify.app)
 
 An app to manage employees late to work
 
