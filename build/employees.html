@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="main.css">
+  <title>LateComerApp | Employees</title>
+</head>
+<body>
+  <header class="main-header">
+    <div class="container main-header-row">
+      <h1 class="main-header-brand">LateComerApp</h1>
+      <nav class="main-header-nav">
+        <ul>
+          <li class="nav-items"><a href="/" class="underline-from-left">Home</a></li>
+          <li class="nav-items"><a href="/employees" class="underline-from-left">Employees</a></li>
+          <li class="nav-items"><a href="/pay" class="underline-from-left">Pay</a></li>
+          <li class="nav-items"><a class="underline-from-left social-footer" target='blank' href="https://github.com/Ucheduk">
+            <i class="zmdi zmdi-github"></i>
+          </a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <section>
+    <div class="container home-section">
+      <div class="form-group request-form" id="search-form">
+        <label for="search"><i class="zmdi zmdi-search"></i></label>
+        <input 
+          type="text"
+          name="search"
+          id="search"
+          placeholder="Search Employees by name or email..."
+        />
+      </div>
+      <div class="employees-data" id="employees-data">
+        <h3>Employees Data</h3>
+      </div>
+    </div>
+  </section>
+
+  <div class="bg-circle-1"></div>
+  <div class="bg-circle-2"></div>
+  <!-- <div class="bg-circle-3"></div> -->
+
+  <footer class="container main-footer">
+    <div class="copyright">
+      <p>&copy; 2020. Made with 💜 for JavaScript
+      </p>
+    </div>
+<!-- 
+    <div class="social social-footer">
+        
+    </div> -->
+  </footer>
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.27.0/moment.min.js"></script>
+  <script src="main.bundle.js"></script>
+</body>
+</html>
