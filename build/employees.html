@@ -14,8 +14,7 @@
         <ul>
           <li class="nav-items"><a href="/" class="underline-from-left">Home</a></li>
           <li class="nav-items"><a href="/employees" class="underline-from-left">Employees</a></li>
-          <li class="nav-items"><a href="/pay" class="underline-from-left">Pay</a></li>
-          <li class="nav-items"><a class="underline-from-left social-footer" target='blank' href="https://github.com/Ucheduk">
+          <li class="nav-items"><a class="underline-from-left social-footer" target='blank' href="https://github.com/Ucheduk/latecomerapp">
             <i class="zmdi zmdi-github"></i>
           </a></li>
         </ul>
@@ -34,8 +33,27 @@
           placeholder="Search Employees by name or email..."
         />
       </div>
+      <h3 class="employees-title">All Employees Data</h3>
       <div class="employees-data" id="employees-data">
-        <h3>Employees Data</h3>
+        <table class="data-table">
+          <thead>
+            <tr class="data-table_tr">
+              <th>Email</th>
+              <th>Name</th>
+              <th>Address</th>
+              <th>Bill</th>
+              <th/>
+            </tr>
+          </thead>
+          <tbody id="listing-table"></tbody>
+        </table>
+      </div>
+      <div class="table-footer">
+        <div>
+          <button type="button" class="btn-ctl" id="btn-prev">Prev &laquo;</button>
+          <button type="button" class="btn-ctl" id="btn-next">Next &raquo;</button>
+        </div>
+        <span id="page"></span>
       </div>
     </div>
   </section>

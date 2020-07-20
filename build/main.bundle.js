@@ -130,15 +130,191 @@ var StorageCtrl = function () {
       localStorage.removeItem('items');
     }
   };
-}(); // App Controller
+}();
+
+var ItemCtrl = function () {
+  return {
+    sortArray: function sortArray(_incomingArray) {
+      var _sortField = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : "bill";
+
+      var _sortOrder = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : "asc";
+
+      var result = [];
+      result = _incomingArray.sort(function (a, b) {
+        if (a[_sortField] < b[_sortField]) {
+          return _sortOrder === "asc" ? 1 : -1;
+        }
+
+        if (a[_sortField] > b[_sortField]) {
+          return _sortOrder === "asc" ? -1 : 1;
+        }
+
+        return 0;
+      });
+      return result;
+    },
+    baseFilter: function baseFilter(_entities, _filter) {
+      var _filtrationFields = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : [];
+
+      // Filtration
+      var entitiesResult = ItemCtrl.searchInArray(_entities, _filter, _filtrationFields);
+      var result = ItemCtrl.sortArray(entitiesResult);
+      return result;
+    },
+    searchInArray: function searchInArray(_incomingArray, _queryObj) {
+      var _filtrationFields = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : [];
+
+      var result = [];
+      var resultBuffer = [];
+      var indexes = [];
+      var firstIndexes = [];
+      var doSearch = false;
+
+      _filtrationFields.forEach(function (item) {
+        if (item in _queryObj) {
+          _incomingArray.forEach(function (element, index) {
+            if (element[item] === _queryObj[item]) {
+              firstIndexes.push(index);
+            }
+          });
+
+          firstIndexes.forEach(function (element) {
+            resultBuffer.push(_incomingArray[element]);
+          });
+          _incomingArray = resultBuffer.slice(0);
+          resultBuffer = [].slice(0);
+          firstIndexes = [].slice(0);
+        }
+      });
+
+      Object.keys(_queryObj).forEach(function (key) {
+        var searchText = _queryObj[key].toString().trim().toLowerCase();
+
+        if (key && !_filtrationFields.some(function (e) {
+          return e === key;
+        }) && searchText) {
+          doSearch = true;
+
+          try {
+            _incomingArray.forEach(function (element, index) {
+              if (element[key] || element[key] === false && searchText === "false") {
+                var _val = element[key].toString().trim().toLowerCase();
+
+                if (_val.indexOf(searchText) > -1 && indexes.indexOf(index) === -1) {
+                  indexes.push(index);
+                }
+              }
+            });
+          } catch (ex) {
+            console.log(ex, key, searchText);
+          }
+        }
+      });
+
+      if (!doSearch) {
+        return _incomingArray;
+      }
+
+      indexes.forEach(function (re) {
+        result.push(_incomingArray[re]);
+      });
+      return result;
+    }
+  };
+}();
+
+var PageCtrl = function (StorageCtrl, ItemCtrl) {
+  var noPerPage = 3;
+  var objJson = ItemCtrl.sortArray(StorageCtrl.getItemsFromStorage());
+  var current_page = 1;
+  var records_per_page = objJson.length < noPerPage ? objJson.length : noPerPage;
+
+  var numPages = function numPages() {
+    if (objJson.length) return Math.ceil(objJson.length / records_per_page);
+    return 0;
+  };
+
+  return {
+    prevPage: function prevPage() {
+      if (current_page > 1) {
+        current_page -= 1;
+        PageCtrl.changePage(current_page);
+      }
+    },
+    nextPage: function nextPage() {
+      if (current_page < numPages()) {
+        current_page += 1;
+        PageCtrl.changePage(current_page);
+      }
+    },
+    searchPage: function searchPage(event) {
+      event.preventDefault();
+      var value = event.target.value;
+      var filter = {
+        email: value,
+        name: value
+      };
+      objJson = ItemCtrl.baseFilter(StorageCtrl.getItemsFromStorage(), filter);
+      current_page = 1;
+      records_per_page = objJson.length < noPerPage ? objJson.length : noPerPage;
+      PageCtrl.changePage();
+    },
+    changePage: function changePage() {
+      var page = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 1;
+      var btnNext = document.getElementById("btn-next");
+      var btnPrev = document.getElementById("btn-prev");
+      var listingTable = document.getElementById("listing-table");
+      var pageSpan = document.getElementById("page"); // Validate page
+
+      if (page < 1) page = 1;
+      if (page > numPages()) page = numPages();
+      listingTable.innerHTML = "";
+
+      if (objJson.length) {
+        var step = page * records_per_page;
+        pageSpan.innerHTML = "page: ".concat(page, " / ").concat(Math.ceil(objJson.length / records_per_page));
+
+        for (var i = (page - 1) * records_per_page; i < (step < objJson.length ? step : objJson.length); i++) {
+          listingTable.innerHTML += "\n            <tr class=\"data-table_tr\">\n              <td>\n                <span>\n                  ".concat(objJson[i].email, "\n                </span>\n              </td>\n              <td>\n                <span>\n                  ").concat(objJson[i].name, "\n                </span>\n              </td>\n              <td>\n                <span>\n                  ").concat(objJson[i].address, "\n                </span>\n              </td>\n              <td>\n                <span>\n                  $").concat(objJson[i].bill, "\n                </span>\n              </td>\n              <td>\n                <span>\n                  <button disabled type=\"button\" class=\"btn-ctl\" id=\"btn-pay\">Pay Bill</button>\n                </span>\n              </td>\n            </tr>\n          ");
+        }
+      } else {
+        listingTable.innerHTML = "<p>No data found</p>";
+        pageSpan.innerHTML = ""; // btnPrev.setAttribute("disable", true);
+        // btnNext.removeAttribute("disable");
+      }
+
+      if (page == 1) {
+        btnPrev.setAttribute("disabled", true);
+      } else {
+        btnPrev.removeAttribute("disabled");
+      }
+
+      if (page == numPages()) {
+        btnNext.setAttribute("disabled", true);
+      } else {
+        btnNext.removeAttribute("disabled");
+      }
+    }
+  };
+}(StorageCtrl, ItemCtrl); // App Controller
 
 
-var App = function (StorageCtrl) {
-  var myForm = document.getElementById('request-form'); // Load event listener
+var App = function (StorageCtrl, PageCtrl) {
+  var myForm = document.getElementById('request-form');
+  var btnNext = document.getElementById("btn-next");
+  var btnPrev = document.getElementById("btn-prev");
+  var searchForm = document.getElementById("search-form"); // Load event listener
 
   var loadEventListener = function loadEventListener() {
     // Form submit event listener
-    myForm.addEventListener('submit', submitForm);
+    if (myForm) myForm.addEventListener('submit', submitForm);
+
+    if (btnNext) {
+      PageCtrl.changePage();
+      btnPrev.addEventListener('click', PageCtrl.prevPage);
+      btnNext.addEventListener('click', PageCtrl.nextPage);
+      searchForm.addEventListener('change', PageCtrl.searchPage);
+    }
   };
 
   var submitForm = function submitForm(event) {
@@ -154,17 +330,20 @@ var App = function (StorageCtrl) {
     console.log(newBody);
     StorageCtrl.storeItems(newBody);
     document.getElementById('success').innerText = "Your data was saved successfully";
+    setTimeout(function () {
+      document.getElementById('success').innerText = "";
+    }, 3000);
     myForm.reset();
   }; // Public Method
 
 
   return {
     init: function init() {
-      // Load event listener
-      loadEventListener();
-    }
+      return loadEventListener();
+    } // Load event listener
+
   };
-}(StorageCtrl); //Initialize App
+}(StorageCtrl, PageCtrl); //Initialize App
 
 
 App.init();
