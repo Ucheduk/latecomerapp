@@ -231,7 +231,7 @@ var PageCtrl = function (StorageCtrl, ItemCtrl) {
 
   var numPages = function numPages() {
     if (objJson.length) return Math.ceil(objJson.length / records_per_page);
-    return 0;
+    return 1;
   };
 
   return {
@@ -279,8 +279,7 @@ var PageCtrl = function (StorageCtrl, ItemCtrl) {
         }
       } else {
         listingTable.innerHTML = "<p>No data found</p>";
-        pageSpan.innerHTML = ""; // btnPrev.setAttribute("disable", true);
-        // btnNext.removeAttribute("disable");
+        pageSpan.innerHTML = "";
       }
 
       if (page == 1) {
@@ -327,7 +326,6 @@ var App = function (StorageCtrl, PageCtrl) {
     body.map(function (item) {
       newBody[item[0]] = item[1];
     });
-    console.log(newBody);
     StorageCtrl.storeItems(newBody);
     document.getElementById('success').innerText = "Your data was saved successfully";
     setTimeout(function () {

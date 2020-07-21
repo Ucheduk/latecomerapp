@@ -215,7 +215,7 @@ const PageCtrl = (function(StorageCtrl, ItemCtrl) {
 
   const numPages = () => {
     if (objJson.length) return Math.ceil(objJson.length / records_per_page);
-    return 0;
+    return 1;
   }
 
   return {
@@ -297,8 +297,6 @@ const PageCtrl = (function(StorageCtrl, ItemCtrl) {
       } else {
         listingTable.innerHTML = "<p>No data found</p>";
         pageSpan.innerHTML = "";
-        // btnPrev.setAttribute("disable", true);
-        // btnNext.removeAttribute("disable");
       }
   
       if (page == 1) {
@@ -344,7 +342,6 @@ const App = ((StorageCtrl, PageCtrl) => {
     body.map((item) => {
       newBody[item[0]] = item[1]
     })
-    console.log(newBody)
     StorageCtrl.storeItems(newBody)
     document.getElementById('success').innerText = "Your data was saved successfully"
     setTimeout(() => {
