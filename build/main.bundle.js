@@ -257,7 +257,7 @@ var PageCtrl = function (StorageCtrl, ItemCtrl) {
       objJson = ItemCtrl.baseFilter(StorageCtrl.getItemsFromStorage(), filter);
       current_page = 1;
       records_per_page = objJson.length < noPerPage ? objJson.length : noPerPage;
-      PageCtrl.changePage();
+      PageCtrl.changePage(1);
     },
     changePage: function changePage() {
       var page = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 1;
@@ -313,7 +313,7 @@ var App = function (StorageCtrl, PageCtrl) {
       PageCtrl.changePage();
       btnPrev.addEventListener('click', PageCtrl.prevPage);
       btnNext.addEventListener('click', PageCtrl.nextPage);
-      searchForm.addEventListener('change', PageCtrl.searchPage);
+      searchForm.addEventListener('input', PageCtrl.searchPage);
     }
   };
 
