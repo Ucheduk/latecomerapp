@@ -14,6 +14,7 @@ const StorageCtrl = (function() {
     const { time, ...newItem  } = item
     return {
         ...newItem,
+        last_date: new Date().toDateString(),
         bill
     }
   }
@@ -23,6 +24,7 @@ const StorageCtrl = (function() {
         ...oldItem,
         name: item.name,
         address: item.address,
+        last_date: new Date().toDateString(),
         bill: +(oldItem.bill + bill).toFixed(2)
     }
   }
@@ -76,6 +78,12 @@ const StorageCtrl = (function() {
           }
 
           return items;
+      },
+      getItemFromStorage: function(item) {
+        let items = StorageCtrl.getItemsFromStorage();
+        const result = items.filter(i => i.email === item.email);
+
+        return result;
       },
       updateItemStorage: function(updateItem) {
           let items = JSON.parse(localStorage.getItem('items'));
@@ -282,6 +290,11 @@ const PageCtrl = (function(StorageCtrl, ItemCtrl) {
               </td>
               <td>
                 <span>
+                  ${objJson[i].last_date}
+                </span>
+              </td>
+              <td>
+                <span>
                   $${objJson[i].bill}
                 </span>
               </td>
@@ -334,6 +347,30 @@ const App = ((StorageCtrl, PageCtrl) => {
     }
   }
 
+  const checkDateSubmitData = (item) => {
+    const foundItem = StorageCtrl.getItemFromStorage(item)
+    if (foundItem.length && foundItem.last_date === new Date().toDateString()) {
+      StorageCtrl.storeItems(item)
+      document.getElementById('success').innerText = "Your data was saved successfully"
+      setTimeout(() => {
+        document.getElementById('success').innerText = ""
+      }, 3000);
+    } 
+    if (!foundItem.length) {
+      StorageCtrl.storeItems(item)
+      document.getElementById('success').innerText = "Your data was saved successfully"
+      setTimeout(() => {
+        document.getElementById('success').innerText = ""
+      }, 3000);
+    } 
+    else {
+      document.getElementById('error').innerText = "Your data has already been saved today"
+      setTimeout(() => {
+        document.getElementById('error').innerText = ""
+      }, 3000);
+    }
+  }
+
   const submitForm = event => {
     event.preventDefault();
     const form = event.target;
@@ -342,11 +379,7 @@ const App = ((StorageCtrl, PageCtrl) => {
     body.map((item) => {
       newBody[item[0]] = item[1]
     })
-    StorageCtrl.storeItems(newBody)
-    document.getElementById('success').innerText = "Your data was saved successfully"
-    setTimeout(() => {
-      document.getElementById('success').innerText = ""
-    }, 3000)
+    checkDateSubmitData(newBody)
     myForm.reset()
   }
 

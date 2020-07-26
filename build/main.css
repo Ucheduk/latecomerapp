@@ -831,7 +831,11 @@ margin-left: auto; }
 }
 .success {
   color: rgb(23, 221, 23);
-  font-size: .9rem !important;
+  font-size: .9rem;
+}
+.error {
+  color: #e22b2b;
+  font-size: .9rem;
 }
 
 .employees-title {

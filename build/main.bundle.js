@@ -39,6 +39,7 @@ var StorageCtrl = function () {
         newItem = _objectWithoutProperties(item, ["time"]);
 
     return _objectSpread(_objectSpread({}, newItem), {}, {
+      last_date: new Date().toDateString(),
       bill: bill
     });
   };
@@ -47,6 +48,7 @@ var StorageCtrl = function () {
     return _objectSpread(_objectSpread({}, oldItem), {}, {
       name: item.name,
       address: item.address,
+      last_date: new Date().toDateString(),
       bill: +(oldItem.bill + bill).toFixed(2)
     });
   }; // Public Methods
@@ -105,6 +107,13 @@ var StorageCtrl = function () {
       }
 
       return items;
+    },
+    getItemFromStorage: function getItemFromStorage(item) {
+      var items = StorageCtrl.getItemsFromStorage();
+      var result = items.filter(function (i) {
+        return i.email === item.email;
+      });
+      return result;
     },
     updateItemStorage: function updateItemStorage(updateItem) {
       var items = JSON.parse(localStorage.getItem('items'));
@@ -275,7 +284,7 @@ var PageCtrl = function (StorageCtrl, ItemCtrl) {
         pageSpan.innerHTML = "page: ".concat(page, " / ").concat(Math.ceil(objJson.length / records_per_page));
 
         for (var i = (page - 1) * records_per_page; i < (step < objJson.length ? step : objJson.length); i++) {
-          listingTable.innerHTML += "\n            <tr class=\"data-table_tr\">\n              <td>\n                <span>\n                  ".concat(objJson[i].email, "\n                </span>\n              </td>\n              <td>\n                <span>\n                  ").concat(objJson[i].name, "\n                </span>\n              </td>\n              <td>\n                <span>\n                  ").concat(objJson[i].address, "\n                </span>\n              </td>\n              <td>\n                <span>\n                  $").concat(objJson[i].bill, "\n                </span>\n              </td>\n              <td>\n                <span>\n                  <button disabled type=\"button\" class=\"btn-ctl\" id=\"btn-pay\">Pay Bill</button>\n                </span>\n              </td>\n            </tr>\n          ");
+          listingTable.innerHTML += "\n            <tr class=\"data-table_tr\">\n              <td>\n                <span>\n                  ".concat(objJson[i].email, "\n                </span>\n              </td>\n              <td>\n                <span>\n                  ").concat(objJson[i].name, "\n                </span>\n              </td>\n              <td>\n                <span>\n                  ").concat(objJson[i].address, "\n                </span>\n              </td>\n              <td>\n                <span>\n                  ").concat(objJson[i].last_date, "\n                </span>\n              </td>\n              <td>\n                <span>\n                  $").concat(objJson[i].bill, "\n                </span>\n              </td>\n              <td>\n                <span>\n                  <button disabled type=\"button\" class=\"btn-ctl\" id=\"btn-pay\">Pay Bill</button>\n                </span>\n              </td>\n            </tr>\n          ");
         }
       } else {
         listingTable.innerHTML = "<p>No data found</p>";
@@ -316,6 +325,31 @@ var App = function (StorageCtrl, PageCtrl) {
     }
   };
 
+  var checkDateSubmitData = function checkDateSubmitData(item) {
+    var foundItem = StorageCtrl.getItemFromStorage(item);
+
+    if (foundItem.length && foundItem.last_date === new Date().toDateString()) {
+      StorageCtrl.storeItems(item);
+      document.getElementById('success').innerText = "Your data was saved successfully";
+      setTimeout(function () {
+        document.getElementById('success').innerText = "";
+      }, 3000);
+    }
+
+    if (!foundItem.length) {
+      StorageCtrl.storeItems(item);
+      document.getElementById('success').innerText = "Your data was saved successfully";
+      setTimeout(function () {
+        document.getElementById('success').innerText = "";
+      }, 3000);
+    } else {
+      document.getElementById('error').innerText = "Your data has already been saved today";
+      setTimeout(function () {
+        document.getElementById('error').innerText = "";
+      }, 3000);
+    }
+  };
+
   var submitForm = function submitForm(event) {
     event.preventDefault();
     var form = event.target;
@@ -326,11 +360,7 @@ var App = function (StorageCtrl, PageCtrl) {
     body.map(function (item) {
       newBody[item[0]] = item[1];
     });
-    StorageCtrl.storeItems(newBody);
-    document.getElementById('success').innerText = "Your data was saved successfully";
-    setTimeout(function () {
-      document.getElementById('success').innerText = "";
-    }, 3000);
+    checkDateSubmitData(newBody);
     myForm.reset();
   }; // Public Method
 
